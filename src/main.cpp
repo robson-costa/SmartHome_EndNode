@@ -13,7 +13,12 @@
 
 // LDR sensor configurations
 #if defined (SENSOR_LDR)
-  #define SENSOR_LDR_PIN  A0
+  #define SENSOR_LDR_PIN    A0
+  #define LUX_CALC_SCALAR   12518931
+  #define LUX_CALC_EXPONENT -1.405
+  #define REF_RESISTANCE    10000
+  #define MAX_ADC_READING   1023
+  #define ADC_REF_VOLTAGE   5.0
 #endif
 
 // PIR sensor configurations
@@ -30,6 +35,7 @@
 // Functions declaration
 #if defined (SENSOR_LDR)
   int getLDRValue(int samples, int interval);
+  float getLDRValueinLux(int samples, int interval);
   float getTemperatureValue(int samples, int interval);
   float getHumidityValue(int samples, int interval);
 #endif
@@ -66,6 +72,7 @@ void loop() {
     #if defined (SENSOR_LDR)
       // Get the LDR (Luminosity) value
       int ldrValue = getLDRValue(10, 1);
+      float lux = getLDRValueinLux(10, 1);
     #endif
 
     #if defined (SENSOR_PIR)
@@ -84,8 +91,10 @@ void loop() {
     // Print the values on serial
     Serial.print("\r\n#############################");
     #if defined (SENSOR_LDR)
-      Serial.print("\r\nLuminosity: ");
+      Serial.print("\r\nLuminosity (0-1023): ");
       Serial.print(ldrValue);
+      Serial.print("\r\nLuminosity (in Lux): ");
+      Serial.print(lux);
     #endif
     #if defined (SENSOR_PIR)
       Serial.print("\r\nPresence: ");
@@ -121,6 +130,29 @@ int getLDRValue(int samples, int interval) {
     delay(interval);
   }
   return value/samples;
+}
+
+float getLDRValueinLux(int samples, int interval) {
+  // Perform the analog to digital conversion
+	int ldrRawData = getLDRValue(samples, interval);
+
+  // RESISTOR VOLTAGE_CONVERSION
+	// Convert the raw digital data back to the voltage that was measured on the analog pin
+	float resistorVoltage = (float)ldrRawData / MAX_ADC_READING * ADC_REF_VOLTAGE;
+
+  // voltage across the LDR is the 5V supply minus the 10k resistor voltage
+  float ldrVoltage = ADC_REF_VOLTAGE - resistorVoltage;
+
+  // LDR_RESISTANCE_CONVERSION
+	// resistance that the LDR would have for that voltage
+	float ldrResistance = ldrVoltage/resistorVoltage * REF_RESISTANCE;
+
+  // LDR_LUX
+	// Change the code below to the proper conversion from ldrResistance to
+	// ldrLux
+	float ldrLux = LUX_CALC_SCALAR * pow(ldrResistance, LUX_CALC_EXPONENT);
+
+  return ldrLux;
 }
 #endif
 
