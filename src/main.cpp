@@ -1,7 +1,5 @@
 #include <Arduino.h>
-#include <Adafruit_Sensor.h>
-#include <DHT.h>
-#include <DHT_U.h>
+#include "DHT_U.h"
 
 // Main execution period (ms)
 #define PERIOD      1000
