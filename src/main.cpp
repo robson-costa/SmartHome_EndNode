@@ -1,3 +1,11 @@
+/**
+* @file main.cpp
+* @author Robson Costa
+* @date 3 Dec 2017
+* @copyright 2017 Robson Costa
+* @brief Main file for SmartHome_EndNode project.
+*/
+
 #include <Arduino.h>
 #include "DHT_U.h"
 
@@ -41,6 +49,12 @@
 // Global variables
 DHT dht(SENSOR_DHT_PIN, SENSOR_DHT_TYPE);
 
+/**
+* @brief Setup function.
+* @param none
+* @return none
+* @details Setup function used to system configuration.
+*/
 void setup() {
     // initialize LED digital pin as an output
     pinMode(LED_BUILTIN, OUTPUT);
@@ -59,6 +73,12 @@ void setup() {
     Serial.begin(115200);
 }
 
+/**
+* @brief Loop function for Arduino project.
+* @param none
+* @return none
+* @details Main function loop.
+*/
 void loop() {
     // turn the LED on/off
     if (digitalRead(LED_BUILTIN) == LOW) {
@@ -116,11 +136,14 @@ void loop() {
 }
 
 #if defined (SENSOR_LDR)
-/* Get the LDR ldrValue
- * params: int samples - number of samples
- *         int interval - interval between samples
- * return: int media between LDR values sampled
- */
+/**
+* @brief getLDRValue - Get the LDR value.
+* @param [in] <sample> <number of samples used>
+*        [in] <interval> <interval between each sample>
+* @return Media between all values sampled.
+* @details Get the digital LDR value (0 -- 1023) converted from an
+* analogic input and based on a 10 bits ADC.
+*/
 int getLDRValue(int samples, int interval) {
   unsigned int value = 0;
   for (int i = 0; i < samples; i++) {
