@@ -3,40 +3,59 @@
 * @author Robson Costa
 * @date 3 Dec 2017
 * @copyright 2017 Robson Costa
-* @brief Main file for SmartHome_EndNode project.
+* @brief Main file for SmartHome - EndNode project.
 */
 
 #include <Arduino.h>
 #include "DHT_U.h"
 
-// Main execution period (ms)
+/** Main execution period (in MS). */
 #define PERIOD      1000
 
-// Define if the sensor is enabled (1) or not (0)
+/** Define if the LDR sensor is enabled or not. */
 #define SENSOR_LDR  1
+
+/** Define if the PIR sensor is enabled or not. */
 #define SENSOR_PIR  1
+
+/** Define if the DHT sensor is enabled or not. */
 #define SENSOR_DHT  1
 
-// LDR sensor configurations
+/** @defgroup SENSOR_LDR LDR sensor group.
+ *  @{
+ */
 #if defined (SENSOR_LDR)
+  /** LDR sensor pin. */
   #define SENSOR_LDR_PIN    A0
+  /** LDR sensor scale to Lux converter. */
   #define LUX_CALC_SCALAR   12518931
+  /** LDR sensor exponent to Lux converter. */
   #define LUX_CALC_EXPONENT -1.405
+  /** LDR sensor resistor value. */
   #define REF_RESISTANCE    10000
+  /** LDR sensor maximum ADC reading. */
   #define MAX_ADC_READING   1023
+  /** LDR sensor voltage. */
   #define ADC_REF_VOLTAGE   5.0
 #endif
+/** @} */
 
 // PIR sensor configurations
 #if defined (SENSOR_PIR)
+  /** PIR sensor pin. */
   #define SENSOR_PIR_PIN  7
 #endif
 
-// DHT sensor configurations
-#if defined (SENSOR_DHT)
+/** @defgroup SENSOR_DHT DHT sensor group.
+ *  @{
+ */
+ #if defined (SENSOR_DHT)
+  /** DHT sensor type. */
   #define SENSOR_DHT_TYPE DHT11
+  /** DHT sensor pin. */
   #define SENSOR_DHT_PIN  A1
 #endif
+/** @} */
 
 // Functions declaration
 #if defined (SENSOR_LDR)
@@ -47,7 +66,7 @@
 #endif
 
 // Global variables
-DHT dht(SENSOR_DHT_PIN, SENSOR_DHT_TYPE);
+DHT dht(SENSOR_DHT_PIN, SENSOR_DHT_TYPE); /*!< DHT global variable. */
 
 /**
 * @brief Setup function.
@@ -77,7 +96,7 @@ void setup() {
 * @brief Loop function for Arduino project.
 * @param none
 * @return none
-* @details Main function loop.
+* @details Main loop function.
 */
 void loop() {
     // turn the LED on/off
@@ -137,9 +156,9 @@ void loop() {
 
 #if defined (SENSOR_LDR)
 /**
-* @brief getLDRValue - Get the LDR value.
-* @param [in] <sample> <number of samples used>
-*        [in] <interval> <interval between each sample>
+* @brief Get the digital LDR value.
+* @param [in] <sample> number of samples used.
+* @param [in] <interval> interval between each sample.
 * @return Media between all values sampled.
 * @details Get the digital LDR value (0 -- 1023) converted from an
 * analogic input and based on a 10 bits ADC.
@@ -153,6 +172,13 @@ int getLDRValue(int samples, int interval) {
   return value/samples;
 }
 
+/**
+* @brief Get the LDR value (in LUX).
+* @param [in] <sample> number of samples used.
+* @param [in] <interval> interval between each sample.
+* @return Media between all values sampled.
+* @details Get the LDR value in LUX scale.
+*/
 float getLDRValueinLux(int samples, int interval) {
   // Perform the analog to digital conversion
 	int ldrRawData = getLDRValue(samples, interval);
@@ -178,10 +204,12 @@ float getLDRValueinLux(int samples, int interval) {
 #endif
 
 #if defined (SENSOR_DHT)
-/* Get the DHT (Temperature) value
- * params: int samples - number of samples
- *         int interval - interval between samples
- * return: float media between temperature values sampled
+ /**
+ * @brief Get the temperature.
+ * @param [in] <sample> number of samples used.
+ * @param [in] <interval> interval between each sample.
+ * @return Media between all values sampled.
+ * @details Get the temperature value (in Celsius) from DHT sensor.
  */
 float getTemperatureValue(int samples, int interval) {
   float value = 0;
@@ -192,11 +220,13 @@ float getTemperatureValue(int samples, int interval) {
   return value/samples;
 }
 
-/* Get the DHT (Humidity) value
- * params: int samples - number of samples
- *         int interval - interval between samples
- * return: float media between humidity values sampled
- */
+/**
+* @brief Get the humidity.
+* @param [in] <sample> number of samples used.
+* @param [in] <interval> interval between each sample.
+* @return Media between all values sampled.
+* @details Get the humidity value (in %) from DHT sensor.
+*/
 float getHumidityValue(int samples, int interval) {
   float value = 0;
   for (int i = 0; i < samples; i++) {
